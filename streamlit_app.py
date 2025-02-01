@@ -32,16 +32,18 @@ if st.session_state.events:
     df = pd.DataFrame(st.session_state.events)
     st.subheader("Upcoming Events")
     
-    # Display events in a table format
-    selected_event = None
+    # Store selected event in session state
+    if "selected_event" not in st.session_state:
+        st.session_state.selected_event = None
+    
     for i, row in df.iterrows():
         if st.button(f"{row['Name']} ({row['Date']} @ {row['Time']})"):
-            selected_event = row
+            st.session_state.selected_event = row.to_dict()  # Store as dictionary
     
     # Display selected event details in a container
-    if selected_event:
+    if st.session_state.selected_event:
         with st.container():
-            st.subheader(f"Details for {selected_event['Name']}")
-            st.write(f"**Date:** {selected_event['Date']}")
-            st.write(f"**Time:** {selected_event['Time']}")
-            st.write(f"**Description:** {selected_event['Description']}")
+            st.subheader(f"Details for {st.session_state.selected_event['Name']}")
+            st.write(f"**Date:** {st.session_state.selected_event['Date']}")
+            st.write(f"**Time:** {st.session_state.selected_event['Time']}")
+            st.write(f"**Description:** {st.session_state.selected_event['Description']}")
