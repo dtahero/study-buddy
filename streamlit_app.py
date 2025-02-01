@@ -13,7 +13,7 @@ except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
 
 # Page title
-st.title("Event Submission and Viewer")
+st.title("Study Buddy")
 
 # Event submission form
 with st.form("event_form"):
