@@ -4,9 +4,13 @@ from datetime import datetime
 from pymongo import MongoClient
 
 # Connect to MongoDB
-client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/")  # Change this to your MongoDB connection string
-db = client["event_db"]
-collection = db["events"]
+try:
+    client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/")
+    db = client["event_db"]
+    collection = db["events"]
+    st.success("Connected to MongoDB successfully!")
+except Exception as e:
+    st.error(f"Failed to connect to MongoDB: {e}")
 
 # Page title
 st.title("Event Submission and Viewer")
@@ -20,18 +24,23 @@ with st.form("event_form"):
     event_description = st.text_area("Event Description")
     submit = st.form_submit_button("Submit Event")
     
-    if submit and event_name and event_description and event_location:
-        # Store event data in MongoDB
-        event_data = {
-            "Name": event_name,
-            "Date": event_date.strftime('%Y-%m-%d'),
-            "Time": event_time.strftime('%H:%M'),
-            "Location": event_location,
-            "Description": event_description
-        }
-        collection.insert_one(event_data)
-        st.success("Event submitted successfully!")
-        st.experimental_rerun()
+    if submit:
+        st.write("Submit button clicked")
+        if event_name and event_description and event_location:
+            st.write("All required fields are filled")
+            # Store event data in MongoDB
+            event_data = {
+                "Name": event_name,
+                "Date": event_date.strftime('%Y-%m-%d'),
+                "Time": event_time.strftime('%H:%M'),
+                "Location": event_location,
+                "Description": event_description
+            }
+            collection.insert_one(event_data)
+            st.success("Event submitted successfully!")
+            st.experimental_rerun()
+        else:
+            st.error("Please fill in all required fields")
 
 # Load events from MongoDB
 events = list(collection.find({}, {"_id": 0}))
