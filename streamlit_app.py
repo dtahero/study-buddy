@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import datetime
-# from pymongo import MongoClient
+from pymongo import MongoClient
 
 # Connect to MongoDB
 client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/")  # Change this to your MongoDB connection string
