@@ -19,16 +19,15 @@ st.markdown(
     """
     <style>
     .center {
-        display: flex;
         justify-content: center;
-        width: 150%;
+        display: flex;
     }
     </style>
     """,
     unsafe_allow_html=True
 )
 
-st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="300"></div>', unsafe_allow_html=True)
+st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
 
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
@@ -51,13 +50,13 @@ def generate_standard_time_options():
     return times
 
 # Page title
-st.title("Study Buddy")
+# st.title("Study Buddy")
 
 # Load events from MongoDB
 events = list(collection.find({}, {"_id": 0}))
 if events:
     df = pd.DataFrame(events)
-    st.subheader("Upcoming Events")
+    st.subheader("Open Study Sessions:")
     
     # Display events in a table format
     selected_event = None
@@ -80,16 +79,16 @@ if events:
 
 # Event submission form
 with st.form("event_form"):
-    event_name = st.text_input("Event Name")
-    event_date = st.date_input("Event Date", min_value=datetime.today())
+    event_name = st.text_input("Session Name and Subject")
+    event_date = st.date_input("Session Date", min_value=datetime.today())
     
     # Custom dropdown for standard time selection
     time_options = generate_standard_time_options()
-    event_time_str = st.selectbox("Event Time", options=time_options)
+    event_time_str = st.selectbox("Session Time", options=time_options)
     
-    event_location = st.text_input("Event Location")
-    event_description = st.text_area("Event Description")
-    submit = st.form_submit_button("Submit Event")
+    event_location = st.text_input("Location")
+    event_description = st.text_area("Description")
+    submit = st.form_submit_button("Submit")
     
     if submit:
         st.write("Submit button clicked")
