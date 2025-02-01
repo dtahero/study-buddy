@@ -3,6 +3,8 @@ import pandas as pd
 from datetime import datetime, time
 from pymongo import MongoClient
 
+
+
 # Connect to MongoDB
 try:
     client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/?retryWrites=true&w=majority")
@@ -11,6 +13,23 @@ try:
     st.success("Connected to MongoDB successfully!")
 except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
+
+    
+# Display image at the top and centered
+st.markdown(
+    """
+    <style>
+    .center {
+        display: flex;
+        justify-content: center;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown('<div class="center"><img src="path/to/your/image.png" width="300"></div>', unsafe_allow_html=True)
+
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
 def convert_to_standard_time(military_time):
