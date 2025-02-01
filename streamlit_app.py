@@ -14,8 +14,7 @@ try:
 except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
 
-    
-# Display image at the top and centered
+# Custom CSS to center the image
 st.markdown(
     """
     <style>
@@ -28,7 +27,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown('<div class="center"><img src="IMG_7441.PNG" width="300"></div>', unsafe_allow_html=True)
+st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="300"></div>', unsafe_allow_html=True)
 
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
