@@ -1,135 +1,47 @@
-import datetime
-import random
-
-import altair as alt
-import numpy as np
-import pandas as pd
 import streamlit as st
+import pandas as pd
+from datetime import datetime
 
-# Show app title and description.
-st.set_page_config(page_title="Support tickets", page_icon="🎫")
-st.title("🎫 Support tickets")
-st.write(
-    """
-    This app shows how you can build an internal tool in Streamlit. Here, we are 
-    implementing a support ticket workflow. The user can create a ticket, edit 
-    existing tickets, and view some statistics.
-    """
-)
+# Page title
+st.title("Event Submission and Viewer")
 
-# Create a random Pandas dataframe with existing tickets.
-if "df" not in st.session_state:
+# Initialize session state for storing events if not already present
+if "events" not in st.session_state:
+    st.session_state.events = []
 
-    # Set seed for reproducibility.
-    np.random.seed(42)
+# Event submission form
+with st.form("event_form"):
+    event_name = st.text_input("Event Name")
+    event_date = st.date_input("Event Date", min_value=datetime.today())
+    event_time = st.time_input("Event Time")
+    event_description = st.text_area("Event Description")
+    submit = st.form_submit_button("Submit Event")
+    
+    if submit and event_name and event_description:
+        # Store event data
+        st.session_state.events.append({
+            "Name": event_name,
+            "Date": event_date.strftime('%Y-%m-%d'),
+            "Time": event_time.strftime('%H:%M'),
+            "Description": event_description
+        })
+        st.success("Event submitted successfully!")
 
-    # Make up some fake issue descriptions.
-    issue_descriptions = [
-        "Network connectivity issues in the office",
-        "Software application crashing on startup",
-        "Printer not responding to print commands",
-        "Email server downtime",
-        "Data backup failure",
-        "Login authentication problems",
-        "Website performance degradation",
-        "Security vulnerability identified",
-        "Hardware malfunction in the server room",
-        "Employee unable to access shared files",
-        "Database connection failure",
-        "Mobile application not syncing data",
-        "VoIP phone system issues",
-        "VPN connection problems for remote employees",
-        "System updates causing compatibility issues",
-        "File server running out of storage space",
-        "Intrusion detection system alerts",
-        "Inventory management system errors",
-        "Customer data not loading in CRM",
-        "Collaboration tool not sending notifications",
-    ]
-
-    # Generate the dataframe with 100 rows/tickets.
-    data = {
-        "ID": [f"TICKET-{i}" for i in range(1100, 1000, -1)],
-        "Issue": np.random.choice(issue_descriptions, size=100),
-        "Status": np.random.choice(["Open", "In Progress", "Closed"], size=100),
-        "Priority": np.random.choice(["High", "Medium", "Low"], size=100),
-        "Date Submitted": [
-            datetime.date(2023, 6, 1) + datetime.timedelta(days=random.randint(0, 182))
-            for _ in range(100)
-        ],
-    }
-    df = pd.DataFrame(data)
-
-    # Save the dataframe in session state (a dictionary-like object that persists across
-    # page runs). This ensures our data is persisted when the app updates.
-    st.session_state.df = df
-
-# Show section to view and edit existing tickets in a table.
-st.header("Existing tickets")
-st.write(f"Number of tickets: `{len(st.session_state.df)}`")
-
-st.info(
-    "You can edit the tickets by double clicking on a cell. Note how the plots below "
-    "update automatically! You can also sort the table by clicking on the column headers.",
-    icon="✍️",
-)
-
-# Show the tickets dataframe with `st.data_editor`. This lets the user edit the table
-# cells. The edited data is returned as a new dataframe.
-edited_df = st.data_editor(
-    st.session_state.df,
-    use_container_width=True,
-    hide_index=True,
-    column_config={
-        "Status": st.column_config.SelectboxColumn(
-            "Status",
-            help="Ticket status",
-            options=["Open", "In Progress", "Closed"],
-            required=True,
-        ),
-        "Priority": st.column_config.SelectboxColumn(
-            "Priority",
-            help="Priority",
-            options=["High", "Medium", "Low"],
-            required=True,
-        ),
-    },
-    # Disable editing the ID and Date Submitted columns.
-    disabled=["ID", "Date Submitted"],
-)
-
-
-
-# Show a section to add a new ticket.
-st.header("Add a ticket")
-
-# We're adding tickets via an `st.form` and some input widgets. If widgets are used
-# in a form, the app will only rerun once the submit button is pressed.
-with st.form("add_ticket_form"):
-    issue = st.text_area("Describe the issue")
-    priority = st.selectbox("Priority", ["High", "Medium", "Low"])
-    submitted = st.form_submit_button("Submit")
-
-if submitted:
-    # Make a dataframe for the new ticket and append it to the dataframe in session
-    # state.
-    recent_ticket_number = int(max(st.session_state.df.ID).split("-")[1])
-    today = datetime.datetime.now().strftime("%m-%d-%Y")
-    df_new = pd.DataFrame(
-        [
-            {
-                "ID": f"TICKET-{recent_ticket_number+1}",
-                "Issue": issue,
-                "Status": "Open",
-                "Priority": priority,
-                "Date Submitted": today,
-            }
-        ]
-    )
-
-    # Show a little success message.
-    st.write("Ticket submitted! Here are the ticket details:")
-    st.dataframe(df_new, use_container_width=True, hide_index=True)
-    st.session_state.df = pd.concat([df_new, st.session_state.df], axis=0)
-
-
+# Convert event data to DataFrame
+if st.session_state.events:
+    df = pd.DataFrame(st.session_state.events)
+    st.subheader("Upcoming Events")
+    
+    # Display events in a table format
+    selected_event = None
+    for i, row in df.iterrows():
+        if st.button(f"{row['Name']} ({row['Date']} @ {row['Time']})"):
+            selected_event = row
+    
+    # Display selected event details in a container
+    if selected_event:
+        with st.container():
+            st.subheader(f"Details for {selected_event['Name']}")
+            st.write(f"**Date:** {selected_event['Date']}")
+            st.write(f"**Time:** {selected_event['Time']}")
+            st.write(f"**Description:** {selected_event['Description']}")
