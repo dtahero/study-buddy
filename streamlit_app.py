@@ -15,7 +15,7 @@ st.title("Event Submission and Viewer")
 with st.form("event_form"):
     event_name = st.text_input("Event Name")
     event_date = st.date_input("Event Date", min_value=datetime.today())
-    event_time = st.time_input("Event Time", format="hh:mm A")
+    event_time = st.time_input("Event Time")
     event_location = st.text_input("Event Location")
     event_description = st.text_area("Event Description")
     submit = st.form_submit_button("Submit Event")
@@ -25,7 +25,7 @@ with st.form("event_form"):
         event_data = {
             "Name": event_name,
             "Date": event_date.strftime('%Y-%m-%d'),
-            "Time": event_time.strftime('%I:%M %p'),
+            "Time": event_time.strftime('%H:%M'),
             "Location": event_location,
             "Description": event_description
         }
