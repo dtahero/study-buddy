@@ -37,7 +37,15 @@ st.title("Study Buddy")
 # Load events from MongoDB
 events = list(collection.find({}, {"_id": 0}))
 if events:
+    # Convert events to a DataFrame
     df = pd.DataFrame(events)
+    
+    # Convert 'Date' and 'Time' to datetime for sorting
+    df['DateTime'] = pd.to_datetime(df['Date'] + ' ' + df['Time'])
+    
+    # Sort events by DateTime in descending order (newest first)
+    df = df.sort_values(by='DateTime', ascending=False)
+    
     st.subheader("Upcoming Events")
     
     # Display events in a table format
@@ -58,6 +66,11 @@ if events:
             st.write(f"**Time:** {display_time}")
             st.write(f"**Location:** {selected_event['Location']}")
             st.write(f"**Description:** {selected_event['Description']}")
+
+
+# Page title
+st.subheader("Event Submission Form")
+
 
 # Event submission form
 with st.form("event_form"):
