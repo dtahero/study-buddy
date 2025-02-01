@@ -3,14 +3,32 @@ import pandas as pd
 from datetime import datetime, time
 from pymongo import MongoClient
 
+
+
 # Connect to MongoDB
 try:
     client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/?retryWrites=true&w=majority")
     db = client["event_db"]
     collection = db["events"]
-    st.success("Connected to MongoDB successfully!")
+    # st.success("Connected to MongoDB successfully!")
 except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
+
+# Custom CSS to center the image
+st.markdown(
+    """
+    <style>
+    .center {
+        justify-content: center;
+        display: flex;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
+
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
 def convert_to_standard_time(military_time):
@@ -32,7 +50,7 @@ def generate_standard_time_options():
     return times
 
 # Page title
-st.title("Study Buddy")
+# st.title("Study Buddy")
 
 # Load events from MongoDB
 events = list(collection.find({}, {"_id": 0}))
@@ -47,25 +65,31 @@ if events:
     df = df.sort_values(by='DateTime', ascending=False)
     
     st.subheader("Upcoming Events")
+    st.subheader("Open Study Sessions:")
     
     # Display events in a table format
-    selected_event = None
+    @st.dialog("Event Details", width="large")
+    def show_event_details(row):
+        display_time = convert_to_standard_time(row['Time'])
+        st.write(f"**Event Name**: {row['Name']}")
+        st.write(f"**Date**: {row['Date']}")
+        st.write(f"**Time**: {display_time}")
+        st.write(f"**Location**: {row['Location']}")
+        # You can add any other details or inputs you want here
+        if st.button("Close"):
+            st.session_state.dialog_open = False
+            st.rerun()
+
+    if "dialog_open" not in st.session_state:
+        st.session_state.dialog_open = False
+
+    # Display buttons to trigger the modal dialog
     for i, row in df.iterrows():
-        # Convert military time to standard time for display
         display_time = convert_to_standard_time(row['Time'])
         if st.button(f"{row['Name']} ({row['Date']} @ {display_time}) - {row['Location']}"):
-            selected_event = row
-    
-    # Display selected event details in a container
-    if selected_event is not None:
-        with st.container():
-            st.subheader(f"Details for {selected_event['Name']}")
-            st.write(f"**Date:** {selected_event['Date']}")
-            # Convert and display time in standard time
-            display_time = convert_to_standard_time(selected_event['Time'])
-            st.write(f"**Time:** {display_time}")
-            st.write(f"**Location:** {selected_event['Location']}")
-            st.write(f"**Description:** {selected_event['Description']}")
+            # Set the flag to True to indicate dialog is open
+            st.session_state.dialog_open = True
+            show_event_details(row)
 
 
 # Page title
@@ -74,16 +98,16 @@ st.subheader("Event Submission Form")
 
 # Event submission form
 with st.form("event_form"):
-    event_name = st.text_input("Event Name")
-    event_date = st.date_input("Event Date", min_value=datetime.today())
+    event_name = st.text_input("Session Name and Subject")
+    event_date = st.date_input("Session Date", min_value=datetime.today())
     
     # Custom dropdown for standard time selection
     time_options = generate_standard_time_options()
-    event_time_str = st.selectbox("Event Time", options=time_options)
+    event_time_str = st.selectbox("Session Time", options=time_options)
     
-    event_location = st.text_input("Event Location")
-    event_description = st.text_area("Event Description")
-    submit = st.form_submit_button("Submit Event")
+    event_location = st.text_input("Location")
+    event_description = st.text_area("Description")
+    submit = st.form_submit_button("Submit")
     
     if submit:
         st.write("Submit button clicked")
