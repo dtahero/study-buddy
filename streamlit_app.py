@@ -10,7 +10,7 @@ try:
     client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/?retryWrites=true&w=majority")
     db = client["event_db"]
     collection = db["events"]
-    st.success("Connected to MongoDB successfully!")
+    # st.success("Connected to MongoDB successfully!")
 except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
 
@@ -21,6 +21,7 @@ st.markdown(
     .center {
         display: flex;
         justify-content: center;
+        width: 150%;
     }
     </style>
     """,
