@@ -55,7 +55,7 @@ if events:
             selected_event = row
     
     # Display selected event details in a container
-    if selected_event:
+    if selected_event is not None:
         with st.container():
             st.subheader(f"Details for {selected_event['Name']}")
             st.write(f"**Date:** {selected_event['Date']}")
