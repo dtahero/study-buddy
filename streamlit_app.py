@@ -32,7 +32,7 @@ def generate_standard_time_options():
     return times
 
 # Page title
-st.title("Event Submission and Viewer")
+st.title("Study Buddy")
 
 # Event submission form
 with st.form("event_form"):
