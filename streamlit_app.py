@@ -28,7 +28,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.markdown('<div class="center"><img src="path/to/your/image.png" width="300"></div>', unsafe_allow_html=True)
+st.markdown('<div class="center"><img src="IMG_7441.PNG" width="300"></div>', unsafe_allow_html=True)
 
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
