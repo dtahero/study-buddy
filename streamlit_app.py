@@ -26,6 +26,38 @@ st.markdown(
 
 st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
 
+# Event submission form
+st.subheader("Add a New Study Session:")
+
+with st.form("event_form"):
+    with st.expander("Event Form"):
+        event_name = st.text_input("Session Name and Subject")
+        event_date = st.date_input("Session Date", min_value=datetime.today())
+        time_options = generate_standard_time_options()
+        event_time_str = st.selectbox("Session Time", options=time_options)
+        event_location = st.text_input("Location")
+        event_description = st.text_area("Description")
+        submit = st.form_submit_button("Submit")
+        
+        if submit:
+            if event_name and event_description and event_location:
+                event_time_obj = datetime.strptime(event_time_str, "%I:%M %p").time()
+                event_time_military = event_time_obj.strftime("%H:%M")
+                
+                event_data = {
+                    "Name": event_name,
+                    "Date": event_date.strftime('%Y-%m-%d'),
+                    "Time": event_time_military,
+                    "Location": event_location,
+                    "Description": event_description
+                }
+                collection.insert_one(event_data)
+                st.success("Event submitted successfully!")
+                st.rerun()
+            else:
+                st.error("Please fill in all required fields")
+
+
 # Function to convert military time to standard time (12-hour format with AM/PM)
 def convert_to_standard_time(military_time):
     try:
@@ -94,32 +126,3 @@ if events:
                 st.session_state.dialog_open = True
                 show_event_details(row)
 
-# Event submission form
-st.subheader("Add a New Study Session:")
-
-with st.form("event_form"):
-    event_name = st.text_input("Session Name and Subject")
-    event_date = st.date_input("Session Date", min_value=datetime.today())
-    time_options = generate_standard_time_options()
-    event_time_str = st.selectbox("Session Time", options=time_options)
-    event_location = st.text_input("Location")
-    event_description = st.text_area("Description")
-    submit = st.form_submit_button("Submit")
-    
-    if submit:
-        if event_name and event_description and event_location:
-            event_time_obj = datetime.strptime(event_time_str, "%I:%M %p").time()
-            event_time_military = event_time_obj.strftime("%H:%M")
-            
-            event_data = {
-                "Name": event_name,
-                "Date": event_date.strftime('%Y-%m-%d'),
-                "Time": event_time_military,
-                "Location": event_location,
-                "Description": event_description
-            }
-            collection.insert_one(event_data)
-            st.success("Event submitted successfully!")
-            st.rerun()
-        else:
-            st.error("Please fill in all required fields")
