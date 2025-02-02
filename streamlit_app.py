@@ -93,7 +93,7 @@ st.markdown('<div style="display: flex; justify-content: center;"><img src="http
 st.subheader("📅 Add a New Study Session")
 
 with st.form("event_form"):
-    with st.expander("➕ Click to Add Event", expanded=True):
+    with st.expander("➕ Click to Add Event", expanded=False):
         event_name = st.text_input("📖 Session Name and Subject")
         event_date = st.date_input("📅 Session Date", min_value=datetime.today())
         time_options = generate_standard_time_options()
