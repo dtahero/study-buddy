@@ -24,7 +24,6 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-
 # Function to convert military time to standard time (12-hour format with AM/PM)
 def convert_to_standard_time(military_time):
     try:
@@ -42,6 +41,18 @@ def generate_standard_time_options():
             times.append(time_obj.strftime("%I:%M %p"))
     return times
 
+# Initialize session state variables for form fields
+if 'event_name' not in st.session_state:
+    st.session_state.event_name = ""
+if 'event_date' not in st.session_state:
+    st.session_state.event_date = datetime.today()
+if 'event_time_str' not in st.session_state:
+    st.session_state.event_time_str = generate_standard_time_options()[0]  # Default to first time option
+if 'event_location' not in st.session_state:
+    st.session_state.event_location = ""
+if 'event_description' not in st.session_state:
+    st.session_state.event_description = ""
+
 st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
 
 # Event submission form
@@ -49,12 +60,12 @@ st.subheader("Add a New Study Session:")
 
 with st.form("event_form"):
     with st.expander("Event Form"):
-        event_name = st.text_input("Session Name and Subject")
-        event_date = st.date_input("Session Date", min_value=datetime.today())
+        event_name = st.text_input("Session Name and Subject", value=st.session_state.event_name)
+        event_date = st.date_input("Session Date", value=st.session_state.event_date, min_value=datetime.today())
         time_options = generate_standard_time_options()
-        event_time_str = st.selectbox("Session Time", options=time_options)
-        event_location = st.text_input("Location")
-        event_description = st.text_area("Description")
+        event_time_str = st.selectbox("Session Time", options=time_options, index=time_options.index(st.session_state.event_time_str))
+        event_location = st.text_input("Location", value=st.session_state.event_location)
+        event_description = st.text_area("Description", value=st.session_state.event_description)
         submit = st.form_submit_button("Submit")
         
         if submit:
@@ -71,16 +82,23 @@ with st.form("event_form"):
                 }
                 collection.insert_one(event_data)
                 st.success("Event submitted successfully!")
-                st.rerun()
+                
+                # Reset the form fields
+                st.session_state.event_name = ""
+                st.session_state.event_date = datetime.today()
+                st.session_state.event_time_str = generate_standard_time_options()[0]  # Reset to default time
+                st.session_state.event_location = ""
+                st.session_state.event_description = ""
+                
+                st.rerun()  # Rerun the app to reflect the changes
             else:
                 st.error("Please fill in all required fields")
-
 
 # Page title
 st.subheader("Open Study Sessions:")
 
 # Load events from MongoDB
-events = list(collection.find({}, {"_id": 0}))
+events = list(collection.find({}, {"_id": 1, "Name": 1, "Date": 1, "Time": 1, "Location": 1, "Description": 1}))
 
 # Sorting dropdown
 sort_by = st.selectbox("Sort events by", ["Date", "Name"])
@@ -109,6 +127,13 @@ if events:
             st.write(f"**Time**: {display_time}")
             st.write(f"**Location**: {row['Location']}")
 
+            # Add a delete button
+            if st.button("Delete Event", key=f"delete_{row['_id']}"):
+                # Delete the event from MongoDB
+                collection.delete_one({"_id": row['_id']})
+                st.success("Event deleted successfully!")
+                st.rerun()  # Rerun the app to reflect the changes
+
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = False
 
@@ -122,4 +147,3 @@ if events:
                         use_container_width=True):
                 st.session_state.dialog_open = True
                 show_event_details(row)
-
