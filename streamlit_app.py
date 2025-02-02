@@ -3,8 +3,6 @@ import pandas as pd
 from datetime import datetime, time
 from pymongo import MongoClient
 
-
-
 # Connect to MongoDB
 try:
     client = MongoClient("mongodb+srv://lihia:6Mh7dVGh0owTaYu3@study-buddy.or22n.mongodb.net/?retryWrites=true&w=majority")
@@ -28,7 +26,6 @@ st.markdown(
 )
 
 st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
-
 
 # Function to convert military time to standard time (12-hour format with AM/PM)
 def convert_to_standard_time(military_time):
@@ -64,7 +61,7 @@ if events:
     # Sort events by DateTime in descending order (newest first)
     df = df.sort_values(by='DateTime', ascending=False)
     
-    st.subheader("Upcoming Events")
+    # st.subheader("Upcoming Events")
     st.subheader("Open Study Sessions:")
     
     # Display events in a table format
@@ -86,15 +83,16 @@ if events:
     # Display buttons to trigger the modal dialog
     for i, row in df.iterrows():
         display_time = convert_to_standard_time(row['Time'])
-        if st.button(f"{row['Name']} ({row['Date']} @ {display_time}) - {row['Location']}"):
-            # Set the flag to True to indicate dialog is open
+        
+        # Add a button to trigger the modal dialog
+        if st.button(f"{row['Name']} @ {row['Location']} | {row['Date']} @ {display_time}",
+                     key=f"button_{i}",
+                     use_container_width=True):
             st.session_state.dialog_open = True
             show_event_details(row)
 
-
 # Page title
 st.subheader("Event Submission Form")
-
 
 # Event submission form
 with st.form("event_form"):
