@@ -79,7 +79,7 @@ if events:
             st.write(f"**Description**: {row['Description']}")
 
 # Event submission form
-st.subheader("Event Submission Form")
+st.subheader("Add a New Study Session:")
 
 with st.form("event_form"):
     event_name = st.text_input("Session Name and Subject")
