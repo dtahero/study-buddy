@@ -108,10 +108,6 @@ if events:
             st.write(f"**Date**: {row['Date']}")
             st.write(f"**Time**: {display_time}")
             st.write(f"**Location**: {row['Location']}")
-            # You can add any other details or inputs you want here
-            if st.button("Close"):
-                st.session_state.dialog_open = False
-                st.rerun()
 
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = False
