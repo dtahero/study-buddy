@@ -86,7 +86,6 @@ if 'event_location' not in st.session_state:
 if 'event_description' not in st.session_state:
     st.session_state.event_description = ""
 
-st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
 # Centered logo
 st.markdown('<div style="display: flex; justify-content: center;"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="400"></div>', unsafe_allow_html=True)
 
@@ -94,15 +93,6 @@ st.markdown('<div style="display: flex; justify-content: center;"><img src="http
 st.subheader("📅 Add a New Study Session")
 
 with st.form("event_form"):
-    with st.expander("Event Form"):
-        event_name = st.text_input("Session Name and Subject", value=st.session_state.event_name)
-        event_date = st.date_input("Session Date", value=st.session_state.event_date, min_value=datetime.today())
-        time_options = generate_standard_time_options()
-        event_time_str = st.selectbox("Session Time", options=time_options, index=time_options.index(st.session_state.event_time_str))
-        event_location = st.text_input("Location", value=st.session_state.event_location)
-        event_description = st.text_area("Description", value=st.session_state.event_description)
-        submit = st.form_submit_button("Submit")
-        
     with st.expander("➕ Click to Add Event", expanded=True):
         event_name = st.text_input("📖 Session Name and Subject")
         event_date = st.date_input("📅 Session Date", min_value=datetime.today())
@@ -126,20 +116,10 @@ with st.form("event_form"):
                     "Description": event_description
                 }
                 collection.insert_one(event_data)
-                st.success("Event submitted successfully!")
-                
-                # Reset the form fields
-                st.session_state.event_name = ""
-                st.session_state.event_date = datetime.today()
-                st.session_state.event_time_str = generate_standard_time_options()[0]  # Reset to default time
-                st.session_state.event_location = ""
-                st.session_state.event_description = ""
-                
-                st.rerun()  # Rerun the app to reflect the changes
-            else:
-                st.error("Please fill in all required fields")
                 st.success("🎉 Event submitted successfully!")
                 st.rerun()
+            else:
+                st.error("⚠️ Please fill in all required fields.")
 
 # Page title
 st.subheader("📌 Open Study Sessions")
@@ -184,16 +164,6 @@ if events:
         if "dialog_open" not in st.session_state:
             st.session_state.dialog_open = False
 
-        # Display buttons to trigger the modal dialog
-        for i, row in df.iterrows():
-            display_time = convert_to_standard_time(row['Time'])
-            
-            # Add a button to trigger the modal dialog
-            if st.button(f"{row['Name']} @ {row['Location']} | {row['Date']} @ {display_time}",
-                        key=f"button_{i}",
-                        use_container_width=True):
-                st.session_state.dialog_open = True
-                show_event_details(row)
         # Scrollable section for events
         with st.container(border=True, height=500):
             for i, row in df.iterrows():
