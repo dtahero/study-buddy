@@ -64,19 +64,33 @@ if events:
     elif sort_by == "Name":
         df = df.sort_values(by='Name', ascending=True)
 
-    # Display events
+    # Display events in a table format
+    @st.dialog("Event Details", width="large")
+    def show_event_details(row):
+        display_time = convert_to_standard_time(row['Time'])
+        st.write(f"**Event Name**: {row['Name']}")
+        st.write(f"**Description**: {row['Description']}")
+        st.write(f"**Date**: {row['Date']}")
+        st.write(f"**Time**: {display_time}")
+        st.write(f"**Location**: {row['Location']}")
+        # You can add any other details or inputs you want here
+        if st.button("Close"):
+            st.session_state.dialog_open = False
+            st.rerun()
+
+    if "dialog_open" not in st.session_state:
+        st.session_state.dialog_open = False
+
+    # Display buttons to trigger the modal dialog
     for i, row in df.iterrows():
         display_time = convert_to_standard_time(row['Time'])
         
-        # Display event information
+        # Add a button to trigger the modal dialog
         if st.button(f"{row['Name']} @ {row['Location']} | {row['Date']} @ {display_time}",
                      key=f"button_{i}",
                      use_container_width=True):
-            st.write(f"**Event Name**: {row['Name']}")
-            st.write(f"**Date**: {row['Date']}")
-            st.write(f"**Time**: {display_time}")
-            st.write(f"**Location**: {row['Location']}")
-            st.write(f"**Description**: {row['Description']}")
+            st.session_state.dialog_open = True
+            show_event_details(row)
 
 # Event submission form
 st.subheader("Add a New Study Session:")
