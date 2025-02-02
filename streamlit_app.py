@@ -14,7 +14,7 @@ try:
 except Exception as e:
     st.error(f"Failed to connect to MongoDB: {e}")
 
-# Custom CSS for rounded containers, box shadows, and colors
+# Custom CSS for rounded containers, box shadows, and event button hover effect
 st.markdown(
     """
     <style>
@@ -41,6 +41,17 @@ st.markdown(
             border-radius: 12px;
             box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
         }
+
+         /* Change event button hover color to green and remove red outline */
+        div[data-testid="stButton"] button {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        div[data-testid="stButton"] button:hover {
+            color: #28a745 !important;
+            border: 2px solid #28a745 !important;
+
+
     </style>
     """,
     unsafe_allow_html=True
@@ -71,8 +82,6 @@ st.subheader("📅 Add a New Study Session")
 
 with st.form("event_form"):
     with st.expander("➕ Click to Add Event", expanded=True):
-# st.markdown('<div class="expander-box">', unsafe_allow_html=True)
-
         event_name = st.text_input("📖 Session Name and Subject")
         event_date = st.date_input("📅 Session Date", min_value=datetime.today())
         time_options = generate_standard_time_options()
@@ -100,8 +109,6 @@ with st.form("event_form"):
             else:
                 st.error("⚠️ Please fill in all required fields.")
 
-        st.markdown('</div>', unsafe_allow_html=True)
-
 # Page title
 st.subheader("📌 Open Study Sessions")
 
@@ -113,8 +120,6 @@ sort_by = st.selectbox("🔍 Sort events by", ["Date", "Name"])
 
 if events:
     with st.container():
-        # st.markdown('<div class="container">', unsafe_allow_html=True)
-
         # Convert events to a DataFrame
         df = pd.DataFrame(events)
 
@@ -123,9 +128,9 @@ if events:
 
         # Sort events based on the selected option
         if sort_by == "Date":
-            df = df.sort_values(by='DateTime', ascending=False)
+            df = df.sort_values(by='DateTime', ascending=True)  # Show earliest date first
         elif sort_by == "Name":
-            df = df.sort_values(by='Name', ascending=True)
+            df = df.sort_values(by='Name', key=lambda x: x.str.lower())  # Case-insensitive sorting
 
         # Display events
         @st.dialog("Event Details", width="large")
@@ -145,11 +150,9 @@ if events:
             for i, row in df.iterrows():
                 display_time = convert_to_standard_time(row['Time'])
 
-                # **Keeping event buttons the same**
+                # **Keeping event buttons the same, just updating hover effect**
                 if st.button(f"{row['Name']} @ {row['Location']} | {row['Date']} @ {display_time}",
                              key=f"button_{i}",
                              use_container_width=True):
                     st.session_state.dialog_open = True
                     show_event_details(row)
-
-        st.markdown('</div>', unsafe_allow_html=True)
