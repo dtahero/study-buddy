@@ -118,6 +118,6 @@ with st.form("event_form"):
             }
             collection.insert_one(event_data)
             st.success("Event submitted successfully!")
-            st.experimental_rerun()
+            st.rerun()
         else:
             st.error("Please fill in all required fields")
