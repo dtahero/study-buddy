@@ -24,6 +24,24 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+
+# Function to convert military time to standard time (12-hour format with AM/PM)
+def convert_to_standard_time(military_time):
+    try:
+        time_obj = datetime.strptime(military_time, "%H:%M")
+        return time_obj.strftime("%I:%M %p")
+    except ValueError:
+        return military_time
+
+# Function to generate standard time options for the dropdown
+def generate_standard_time_options():
+    times = []
+    for hour in range(0, 24):
+        for minute in range(0, 60, 15):  # 15-minute intervals
+            time_obj = time(hour, minute)
+            times.append(time_obj.strftime("%I:%M %p"))
+    return times
+
 st.markdown('<div class="center"><img src="https://github.com/dtahero/study-buddy/blob/main/IMG_7441.PNG?raw=true" width="500"></div>', unsafe_allow_html=True)
 
 # Event submission form
@@ -57,23 +75,6 @@ with st.form("event_form"):
             else:
                 st.error("Please fill in all required fields")
 
-
-# Function to convert military time to standard time (12-hour format with AM/PM)
-def convert_to_standard_time(military_time):
-    try:
-        time_obj = datetime.strptime(military_time, "%H:%M")
-        return time_obj.strftime("%I:%M %p")
-    except ValueError:
-        return military_time
-
-# Function to generate standard time options for the dropdown
-def generate_standard_time_options():
-    times = []
-    for hour in range(0, 24):
-        for minute in range(0, 60, 15):  # 15-minute intervals
-            time_obj = time(hour, minute)
-            times.append(time_obj.strftime("%I:%M %p"))
-    return times
 
 # Page title
 st.subheader("Open Study Sessions:")
